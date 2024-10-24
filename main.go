@@ -8,7 +8,8 @@ import (
 )
 
 func home(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("hello from snippetbox"))
+	w.Header().Add("Server", "Go")
+	w.Write([]byte("Hello from snippetbox"))
 }
 
 func snippetView(w http.ResponseWriter, r *http.Request) {
@@ -18,19 +19,25 @@ func snippetView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	msg := fmt.Sprintf("view a specific snippet with id %d", id)
+	msg := fmt.Sprintf("Display a specific snippet with id %d", id)
 	w.Write([]byte(msg))
 }
 
 func snippetCreate(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("create a snippet"))
+	w.Write([]byte("Display a form to create a new snippet"))
+}
+
+func snippetCreatePost(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte("Save a new snippet"))
 }
 
 func main() {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/{$}", home)
-	mux.HandleFunc("/snippet/view/{id}", snippetView)
-	mux.HandleFunc("/snippet/create", snippetCreate)
+	mux.HandleFunc("GET /{$}", home)
+	mux.HandleFunc("GET /snippet/view/{id}", snippetView)
+	mux.HandleFunc("GET /snippet/create", snippetCreate)
+	mux.HandleFunc("POST /snippet/create", snippetCreatePost)
 
 	log.Print("starting server on :8080")
 	err := http.ListenAndServe(":8080", mux)
