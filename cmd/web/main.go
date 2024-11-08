@@ -16,20 +16,14 @@ func main() {
 	flag.Parse()
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
-	app := &application{logger}
 
-	mux := http.NewServeMux()
-
-	fileServer := http.FileServer(neuteredFileSystem{http.Dir("./ui/static/")})
-	mux.Handle("GET /static/", http.StripPrefix("/static", fileServer))
-
-	mux.HandleFunc("GET /{$}", app.home)
-	mux.HandleFunc("GET /snippet/view/{id}", app.snippetView)
-	mux.HandleFunc("GET /snippet/create", app.snippetCreate)
-	mux.HandleFunc("POST /snippet/create", app.snippetCreatePost)
+	app := &application{
+		logger: logger,
+	}
 
 	logger.Info("starting server", slog.String("addr", *addr))
-	err := http.ListenAndServe(*addr, mux)
+
+	err := http.ListenAndServe(*addr, app.routes())
 	slog.Error(err.Error())
 	os.Exit(1)
 }
