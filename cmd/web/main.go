@@ -6,14 +6,16 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"text/template"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jfilipedias/snippetbox/internal/model"
 )
 
 type application struct {
-	logger   *slog.Logger
-	snippets *model.SnippetModel
+	logger        *slog.Logger
+	snippets      *model.SnippetModel
+	templateCache map[string]*template.Template
 }
 
 func main() {
@@ -28,12 +30,18 @@ func main() {
 		logger.Error(err.Error())
 		os.Exit(1)
 	}
-
 	defer db.Close()
 
+	templateCache, err := newTamplateCache()
+	if err != nil {
+		logger.Error(err.Error())
+		os.Exit(1)
+	}
+
 	app := &application{
-		logger:   logger,
-		snippets: &model.SnippetModel{DB: db},
+		logger:        logger,
+		snippets:      &model.SnippetModel{DB: db},
+		templateCache: templateCache,
 	}
 
 	logger.Info("starting server", slog.String("addr", *addr))

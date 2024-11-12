@@ -1,8 +1,44 @@
 package main
 
-import "github.com/jfilipedias/snippetbox/internal/model"
+import (
+	"path/filepath"
+	"text/template"
+
+	"github.com/jfilipedias/snippetbox/internal/model"
+)
 
 type templateData struct {
 	Snippet  model.Snippet
 	Snippets []model.Snippet
+}
+
+func newTamplateCache() (map[string]*template.Template, error) {
+	cache := map[string]*template.Template{}
+
+	pages, err := filepath.Glob("./ui/html/pages/*.tmpl")
+	if err != nil {
+		return nil, err
+	}
+
+	for _, page := range pages {
+		ts, err := template.ParseFiles("./ui/html/base.tmpl")
+		if err != nil {
+			return nil, err
+		}
+
+		ts, err = ts.ParseGlob("./ui/html/partials/*.tmpl")
+		if err != nil {
+			return nil, err
+		}
+
+		name := filepath.Base(page)
+		ts, err = ts.ParseFiles(page)
+		if err != nil {
+			return nil, err
+		}
+
+		cache[name] = ts
+	}
+
+	return cache, nil
 }
