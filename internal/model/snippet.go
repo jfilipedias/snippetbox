@@ -64,8 +64,7 @@ func (m *SnippetModel) Latest() ([]Snippet, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	defer m.DB.Close()
+	defer rows.Close()
 
 	var snippets []Snippet
 	for rows.Next() {
