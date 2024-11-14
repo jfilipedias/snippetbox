@@ -1,15 +1,32 @@
 package main
 
 import (
+	"net/http"
 	"path/filepath"
 	"text/template"
+	"time"
 
 	"github.com/jfilipedias/snippetbox/internal/model"
 )
 
 type templateData struct {
-	Snippet  model.Snippet
-	Snippets []model.Snippet
+	CurrentYear int
+	Snippet     model.Snippet
+	Snippets    []model.Snippet
+}
+
+func (app *application) newTemplateData(r *http.Request) templateData {
+	return templateData{
+		CurrentYear: time.Now().Year(),
+	}
+}
+
+func humanDate(t time.Time) string {
+	return t.Format("02 Jan 2006 at 15:04")
+}
+
+var functions = template.FuncMap{
+	"humanDate": humanDate,
 }
 
 func newTamplateCache() (map[string]*template.Template, error) {
@@ -21,7 +38,8 @@ func newTamplateCache() (map[string]*template.Template, error) {
 	}
 
 	for _, page := range pages {
-		ts, err := template.ParseFiles("./ui/html/base.tmpl")
+		name := filepath.Base(page)
+		ts, err := template.New(name).Funcs(functions).ParseFiles("./ui/html/base.tmpl")
 		if err != nil {
 			return nil, err
 		}
@@ -31,7 +49,6 @@ func newTamplateCache() (map[string]*template.Template, error) {
 			return nil, err
 		}
 
-		name := filepath.Base(page)
 		ts, err = ts.ParseFiles(page)
 		if err != nil {
 			return nil, err
