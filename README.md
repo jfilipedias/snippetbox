@@ -21,3 +21,10 @@ The web app uses a MySQL database to persist the users data. You can setup a doc
 ```sh
 $ docker compose up -d
 ```
+
+## Dependencies
+
+- [alexedwards/scs](https://github.com/alexedwards/scs): A session manager tool to handle flash messages.
+- [go-playground/form](https://github.com/go-playground/form): A form parser to get the fields value.
+- [go-sql-driver/mysql](https://github.com/go-sql-driver/mysql): A MySQL driver.
+- [justinas/alice](https://github.com/justinas/alice): A middleware chaining tool.
