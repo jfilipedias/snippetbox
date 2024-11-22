@@ -4,7 +4,7 @@
 	<form action="/snippet/create" method="POST">
 		<div>
 			<label for="title">Title:</label>
-			<input type="text" name="title" id="title" value={{.Form.Title}}>
+			<input type="text" name="title" id="title" value="{{.Form.Title}}">
 			{{with .Form.FieldErrors.title}}
 				<em class="error">{{.}}</em>
 			{{end}}
