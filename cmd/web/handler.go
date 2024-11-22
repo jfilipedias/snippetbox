@@ -68,7 +68,7 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
 	}
 
 	form.CheckField(validator.NotBlank(form.Title), "title", "This field cannot be blank.")
-	form.CheckField(validator.MaxChar(form.Title, 100), "title", "This field cannot be more than 100 characters long.")
+	form.CheckField(validator.MaxChars(form.Title, 100), "title", "This field cannot be more than 100 characters long.")
 	form.CheckField(validator.NotBlank(form.Content), "content", "This field cannot be blank.")
 	form.CheckField(validator.PermittedValue(form.Expires, 1, 7, 365), "expires", "This field must be equal 1, 7, 365")
 
@@ -89,8 +89,17 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
 	http.Redirect(w, r, fmt.Sprintf("/snippet/view/%d", id), http.StatusSeeOther)
 }
 
+type signupForm struct {
+	Name     string `form:"name"`
+	Email    string `form:"email"`
+	Password string `form:"password"`
+	validator.Validator
+}
+
 func (app *application) signup(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Display a sign up form")
+	data := app.newTemplateData(r)
+	data.Form = signupForm{}
+	app.render(w, r, http.StatusOK, "signup.tmpl", data)
 }
 
 func (app *application) signupPost(w http.ResponseWriter, r *http.Request) {
