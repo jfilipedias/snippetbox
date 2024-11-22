@@ -103,7 +103,44 @@ func (app *application) signup(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) signupPost(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Create a new user")
+	var form signupForm
+	err := app.decodePostForm(r, &form)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form.CheckField(validator.NotBlank(form.Name), "name", "This field cannot be blank.")
+	form.CheckField(validator.MaxChars(form.Name, 255), "name", "This field cannot be more than 255 characters long.")
+	form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be blank.")
+	form.CheckField(validator.MaxChars(form.Email, 255), "email", "This field cannot be more than 255 characters long.")
+	form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address.")
+	form.CheckField(validator.NotBlank(form.Password), "password", "This field cannot be blank.")
+	form.CheckField(validator.MinChars(form.Password, 8), "password", "This field must be at least 8 characters long.")
+
+	if !form.Valid() {
+		data := app.newTemplateData(r)
+		data.Form = form
+		app.render(w, r, http.StatusUnprocessableEntity, "signup.tmpl", data)
+		return
+	}
+
+	err = app.users.Insert(form.Name, form.Email, form.Password)
+	if err != nil {
+		if errors.Is(err, model.ErrDuplicatedEmail) {
+			form.AddFieldError("email", "Email address is already in use.")
+			data := app.newTemplateData(r)
+			data.Form = form
+			app.render(w, r, http.StatusUnprocessableEntity, "signup.tmpl", data)
+		} else {
+			app.serverError(w, r, err)
+		}
+
+		return
+	}
+
+	app.sessionManager.Put(r.Context(), "flash", "Your signup was successfull. Please log in.")
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
 func (app *application) login(w http.ResponseWriter, r *http.Request) {
