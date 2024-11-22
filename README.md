@@ -28,3 +28,4 @@ $ docker compose up -d
 - [go-playground/form](https://github.com/go-playground/form): A form parser to get the fields value.
 - [go-sql-driver/mysql](https://github.com/go-sql-driver/mysql): A MySQL driver.
 - [justinas/alice](https://github.com/justinas/alice): A middleware chaining tool.
+- [golang.org/x/crypto](https://cs.opensource.google/go/x/crypto): Cryptography tool to handle password hashing.
