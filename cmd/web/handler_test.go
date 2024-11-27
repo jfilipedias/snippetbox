@@ -73,3 +73,13 @@ func TestSnippetView(t *testing.T) {
 		})
 	}
 }
+
+func TestSignup(t *testing.T) {
+	app := newTestApplication(t)
+	ts := newTestServer(t, app.routes())
+	defer ts.Close()
+
+	_, _, body := ts.get(t, "/signup")
+	csfrToken := assert.ExtractCSRFToken(t, body)
+	t.Logf("CSFR token is: %q", csfrToken)
+}
