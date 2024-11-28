@@ -1,8 +1,6 @@
 package assert
 
 import (
-	"html"
-	"regexp"
 	"strings"
 	"testing"
 )
@@ -21,15 +19,4 @@ func StringContains(t *testing.T, got, want string) {
 	if !strings.Contains(got, want) {
 		t.Errorf("got: %q; expected to contain: %q", got, want)
 	}
-}
-
-var csrfTokenRx = regexp.MustCompile(`<input type='hidden' name='csrf_token' value='(.+)'>`)
-
-func ExtractCSRFToken(t *testing.T, body string) string {
-	matches := csrfTokenRx.FindStringSubmatch(body)
-	if len(matches) < 2 {
-		t.Fatal("no csrf token found in body")
-	}
-
-	return html.UnescapeString(matches[1])
 }
