@@ -18,6 +18,7 @@ import (
 )
 
 type application struct {
+	debug          bool
 	logger         *slog.Logger
 	snippets       model.SnippetModelInterface
 	users          model.UserModelInterface
@@ -29,6 +30,7 @@ type application struct {
 func main() {
 	addr := flag.String("addr", ":4000", "HTTP network address")
 	dsn := flag.String("dsn", "local_user:local_password@/snippetbox?parseTime=true", "MySQL data source name")
+	debug := flag.Bool("debug", false, "Display detailed errors with stack taces through HTTP responses")
 	flag.Parse()
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
@@ -54,6 +56,7 @@ func main() {
 	sessionManager.Cookie.Secure = true
 
 	app := &application{
+		debug:          *debug,
 		logger:         logger,
 		snippets:       &model.SnippetModel{DB: db},
 		users:          &model.UserModel{DB: db},
