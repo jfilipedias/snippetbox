@@ -1,6 +1,18 @@
 package mock
 
-import "github.com/jfilipedias/snippetbox/internal/model"
+import (
+	"time"
+
+	"github.com/jfilipedias/snippetbox/internal/model"
+)
+
+var mockUser = model.User{
+	ID:             1,
+	Name:           "Alice",
+	Email:          "alice@example.com",
+	HashedPassword: []byte{},
+	Created:        time.Now(),
+}
 
 type UserModel struct{}
 
@@ -27,5 +39,14 @@ func (m *UserModel) Exists(id int) (bool, error) {
 		return true, nil
 	default:
 		return false, nil
+	}
+}
+
+func (m *UserModel) Get(id int) (model.User, error) {
+	switch id {
+	case 1:
+		return mockUser, nil
+	default:
+		return model.User{}, model.ErrNoRecord
 	}
 }

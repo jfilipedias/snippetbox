@@ -16,6 +16,7 @@ type templateData struct {
 	CurrentYear     int
 	Snippet         model.Snippet
 	Snippets        []model.Snippet
+	User            model.User
 	Form            any
 	Flash           string
 	IsAuthenticated bool
