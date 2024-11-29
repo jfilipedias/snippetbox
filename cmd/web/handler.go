@@ -273,6 +273,13 @@ func (app *application) accountPasswordUpdatePost(w http.ResponseWriter, r *http
 		app.render(w, r, http.StatusBadRequest, "password.tmpl", data)
 		return
 	}
+
+	id := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
+	err = app.users.PasswordUpdate(id, form.CurrentPassword, form.NewPassword)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
 }
 
 func ping(w http.ResponseWriter, _ *http.Request) {
