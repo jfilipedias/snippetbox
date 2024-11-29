@@ -52,10 +52,9 @@ func (m *UserModel) Get(id int) (model.User, error) {
 }
 
 func (m *UserModel) PasswordUpdate(id int, currentPassword, newPassword string) error {
-	switch currentPassword {
-	case "pa$$word":
+	if id == 1 && currentPassword == "pa$$word" {
 		return nil
-	default:
-		return model.ErrInvalidCredentials
 	}
+
+	return model.ErrInvalidCredentials
 }
